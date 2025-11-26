@@ -80,7 +80,7 @@ class NetworkApiServices implements BaseApiServices {
   /// Print debug metadata request (method, URL, header, body).
   void _logRequest(String method, Uri uri, String apiKey, [dynamic data]) {
     print("== $method REQUEST ==");
-    print("Headers: { key: $apiKey }");
+    // print("API Key: { key: $apiKey }");
     print("Final URL ($method): $uri");
     if (data != null) {
       print("Data body: $data");

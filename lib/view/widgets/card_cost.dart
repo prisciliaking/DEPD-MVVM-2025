@@ -21,6 +21,12 @@ class _CardCostState extends State<CardCost> {
     return formatter.format(value);
   }
 
+  // Memformat satuan "day" menjadi "hari" pada estimasi pengiriman
+  String formatEtd(String? etd) {
+    if (etd == null || etd.isEmpty) return '-';
+    return etd.replaceAll('day', 'hari').replaceAll('days', 'hari');
+  }
+
   @override
   Widget build(BuildContext context) {
     Costs cost = widget.cost;
@@ -30,30 +36,41 @@ class _CardCostState extends State<CardCost> {
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(color: Colors.blue[800]!),
       ),
-      margin: const EdgeInsetsDirectional.symmetric(vertical: 16),
+      margin: const EdgeInsetsDirectional.symmetric(
+        vertical: 8,
+        horizontal: 16,
+      ),
       color: Colors.white,
       child: ListTile(
-          title: Text(
-              style: TextStyle(
-                  color: Colors.blue[800], fontWeight: FontWeight.w700),
-              "${cost.name}: ${cost.service}"),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                  style: const TextStyle(
-                      color: Colors.black, fontWeight: FontWeight.w500),
-                  "Biaya: ${rupiahMoneyFormatter(cost.cost)}"),
-              const SizedBox(height: 4),
-              Text(
-                  style: TextStyle(color: Colors.green[800]),
-                  "Estimasi sampai: ${cost.etd}"),
-            ],
+        title: Text(
+          style: TextStyle(
+            color: Colors.blue[800],
+            fontWeight: FontWeight.w700,
           ),
-          leading: CircleAvatar(
-            backgroundColor: Colors.blue[50],
-            child: Icon(Icons.local_shipping, color: Colors.blue[800]),
-          )),
+          "${cost.name}: ${cost.service}",
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w500,
+              ),
+              "Biaya: ${rupiahMoneyFormatter(cost.cost)}",
+            ),
+            const SizedBox(height: 4),
+            Text(
+              style: TextStyle(color: Colors.green[800]),
+              "Estimasi sampai: ${formatEtd(cost.etd)}",
+            ),
+          ],
+        ),
+        leading: CircleAvatar(
+          backgroundColor: Colors.blue[50],
+          child: Icon(Icons.local_shipping, color: Colors.blue[800]),
+        ),
+      ),
     );
   }
 }
