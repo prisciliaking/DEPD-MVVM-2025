@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:depd_mvvm_2025/shared/style.dart';
-import 'package:depd_mvvm_2025/view/pages/pages.dart';
+// IMPORTANT: Import the MainWrapper from lib/view/
+import 'package:depd_mvvm_2025/view/main_wrapper.dart'; 
+
 import 'package:depd_mvvm_2025/viewmodel/home_viewmodel.dart';
 
 Future<void> main() async {
@@ -23,7 +25,7 @@ class MyApp extends StatelessWidget {
       create: (_) => HomeViewModel(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Flutter x RajaOngkir API',
+        title: 'Shipping Cost App', 
         theme: ThemeData(
           primaryColor: Style.blue800,
           scaffoldBackgroundColor: Style.grey50,
@@ -56,8 +58,12 @@ class MyApp extends StatelessWidget {
           ),
           useMaterial3: true,
         ),
+        
         initialRoute: '/',
-        routes: {'/': (context) => const HomePage()},
+        routes: {
+          // Pointing the root route to the MainWrapper
+          '/': (context) => const MainWrapper(), 
+        },
       ),
     );
   }

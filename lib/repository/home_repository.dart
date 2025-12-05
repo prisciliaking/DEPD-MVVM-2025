@@ -73,4 +73,60 @@ class HomeRepository {
 
     return data.map((e) => Costs.fromJson(e)).toList();
   }
+
+  // --- International Methods (Updated) ---
+
+  // Endpoint: rajaongkir.komerce.id/api/v1/destination/international-destination
+  // Mengambil daftar negara tujuan internasional, dengan fixed limit/offset
+  Future<List<InternationalDestination>> fetchInternationalDestinationList({
+    required String search, 
+  }) async {
+    // FIX: Construct the full endpoint including limit=20 and offset=0, 
+    // leveraging the now-fixed NetworkApiServices for URI construction.
+    final endpoint = 'destination/international-destination?search=$search&limit=20&offset=0';
+
+    final response = await _apiServices.getApiResponse(endpoint);
+
+    final meta = response['meta'];
+    if (meta == null || meta['status'] != 'success') {
+      throw Exception("API Error: ${meta?['message'] ?? 'Unknown error'}");
+    }
+
+    // Parse international destination data
+    final data = response['data'];
+    if (data is! List) return [];
+
+    // Map raw data to the InternationalDestination model
+    return data.map((e) => InternationalDestination.fromJson(e)).toList();
+  }
+  
+  // Endpoint: rajaongkir.komerce.id/api/v1/calculate/international-cost
+  // Menghitung biaya pengiriman internasional
+  Future<List<Costs>> checkInternationalShipmentCost(
+    String originCityId, // Domestic City ID
+    String destinationCountryId, // International Country ID
+    int weight,
+    String courier,
+  ) async {
+    // Uses the international cost calculation endpoint
+    final response = await _apiServices
+        .postApiResponse('calculate/international-cost', {
+          // Origin must be domestic city ID and destination must be country ID
+          "origin": originCityId,
+          "destination": destinationCountryId,
+          "weight": weight.toString(),
+          "courier": courier,
+        });
+
+    final meta = response['meta'];
+    if (meta == null || meta['status'] != 'success') {
+      throw Exception("API Error: ${meta?['message'] ?? 'Unknown error'}");
+    }
+
+    // Uses the existing Costs model, as requested.
+    final data = response['data'];
+    if (data is! List) return [];
+
+    return data.map((e) => Costs.fromJson(e)).toList();
+  }
 }

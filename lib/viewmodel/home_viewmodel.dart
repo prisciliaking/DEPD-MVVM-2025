@@ -131,4 +131,64 @@ class HomeViewModel with ChangeNotifier {
           setLoading(false);
         });
   }
+
+  // --- International State & Methods (Updated & Fixed) ---
+
+  // State daftar negara tujuan internasional: Holds the list of InternationalDestination objects (countries)
+  ApiResponse<List<InternationalDestination>> internationalDestinations =
+      ApiResponse.notStarted();
+  setInternationalDestinations(
+      ApiResponse<List<InternationalDestination>> response) {
+    internationalDestinations = response;
+    notifyListeners();
+  }
+
+  // State daftar biaya ongkir internasional: Holds the list of Costs objects
+  ApiResponse<List<Costs>> internationalCostList = ApiResponse.notStarted();
+  setInternationalCostList(ApiResponse<List<Costs>> response) {
+    internationalCostList = response;
+    notifyListeners();
+  }
+
+  // FIX: This method now accepts the required 'search' parameter.
+  Future getInternationalDestinationList({required String search}) async {
+    // We do NOT check for Status.completed here because a new search query
+    // always constitutes a new request.
+    setInternationalDestinations(ApiResponse.loading()); 
+    _homeRepo
+        // FIX: Passing the required 'search' parameter to the Repository
+        .fetchInternationalDestinationList(search: search)
+        .then((value) {
+          setInternationalDestinations(ApiResponse.completed(value));
+        })
+        .onError((error, _) {
+          setInternationalDestinations(ApiResponse.error(error.toString()));
+        });
+  }
+  
+  // Hitung biaya pengiriman internasional
+  Future checkInternationalShipmentCost(
+    String originCityId,
+    String destinationCountryId,
+    int weight,
+    String courier,
+  ) async {
+    setLoading(true);
+    setInternationalCostList(ApiResponse.loading());
+    _homeRepo
+        .checkInternationalShipmentCost(
+          originCityId,
+          destinationCountryId,
+          weight,
+          courier,
+        )
+        .then((value) {
+          setInternationalCostList(ApiResponse.completed(value));
+          setLoading(false);
+        })
+        .onError((error, _) {
+          setInternationalCostList(ApiResponse.error(error.toString()));
+          setLoading(false);
+        });
+  }
 }

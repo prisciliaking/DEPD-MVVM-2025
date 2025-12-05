@@ -9,12 +9,41 @@ import 'package:depd_mvvm_2025/shared/shared.dart';
 
 /// Implementasi BaseApiServices untuk menangani request GET, POST ke API RajaOngkir.
 class NetworkApiServices implements BaseApiServices {
+
+  // Helper untuk memastikan tidak ada slash ganda dan slash di awal path
+  String _cleanPath(String path) {
+    // Menghapus slash ganda dan slash di awal path, tapi biarkan slash di dalam path
+    return path.replaceAll(RegExp(r'^\/+|\/+$'), '');
+  }
+
   /// Melakukan request GET ke endpoint
   /// Mengembalikan JSON ter-decode atau melempar AppException yang sesuai.
   @override
   Future<dynamic> getApiResponse(String endpoint) async {
     try {
-      final uri = Uri.https(Const.baseUrl, Const.subUrl + endpoint);
+      // FIX URL BUILDING: Separate path and query parameters correctly.
+      final uriParts = endpoint.split('?');
+      
+      // Ambil path utama (subUrl) dan gabungkan dengan endpoint bersih. 
+      // Hasilnya harus seperti: 'api/v1/destination/international-destination'
+      final path = _cleanPath(Const.subUrl) + '/' + _cleanPath(uriParts[0]); 
+      
+      Map<String, dynamic> queryParameters = {};
+
+      // Pisahkan query parameters
+      if (uriParts.length > 1) {
+        final queryStrings = uriParts[1].split('&');
+        for (var qs in queryStrings) {
+          final pair = qs.split('=');
+          if (pair.length == 2) {
+            // Add key/value pair to the map; Uri.https handles the final encoding.
+            queryParameters[pair[0]] = pair[1];
+          }
+        }
+      }
+      
+      // Gunakan Uri.https untuk konstruksi URL yang aman.
+      final uri = Uri.https(Const.baseUrl, path, queryParameters);
 
       // Log request GET (untuk debug: URL + header).
       _logRequest('GET', uri, Const.apiKey);
@@ -42,11 +71,12 @@ class NetworkApiServices implements BaseApiServices {
   }
 
   /// Melakukan request POST dengan body form-url-encoded.
-  /// Mengembalikan JSON ter-decode atau melempar AppException yang sesuai.
   @override
   Future<dynamic> postApiResponse(String endpoint, dynamic data) async {
     try {
-      final uri = Uri.https(Const.baseUrl, Const.subUrl + endpoint);
+      // Path akhir: gabungkan subUrl dan path yang bersih
+      final path = _cleanPath(Const.subUrl) + '/' + _cleanPath(endpoint); 
+      final uri = Uri.https(Const.baseUrl, path);
 
       // Log request POST termasuk payload body.
       _logRequest('POST', uri, Const.apiKey, data);
@@ -66,11 +96,8 @@ class NetworkApiServices implements BaseApiServices {
       // Perangkat offline.
       throw NoInternetException('No internet connection!');
     } on TimeoutException {
-      // Jaringan lambat atau server tidak merespon.
+      // Waktu request melewati batas timeout.
       throw FetchDataException('Network request timeout!');
-    } on FormatException {
-      // Format respons tidak valid saat decode.
-      throw FetchDataException('Invalid response format!');
     } catch (e) {
       // Fallback umum.
       throw FetchDataException('Unexpected error: $e');
