@@ -15,7 +15,7 @@ class _InternationalPageState extends State<InternationalPage> {
 
   final List<String> courierOptions = ["jne", "pos", "tiki", "lion", "sicepat"];
   String selectedCourier = "jne";
-  
+
   int? selectedProvinceOriginId;
   int? selectedCityOriginId;
   int? selectedDestinationCountryId;
@@ -61,9 +61,6 @@ class _InternationalPageState extends State<InternationalPage> {
       }
     });
   }
-
-  // --- HAPUS FUNGSI _handleOriginDataLoad ---
-  // Logika auto-select akan dipindahkan langsung ke onChanged Province
 
   @override
   void dispose() {
@@ -220,9 +217,7 @@ class _InternationalPageState extends State<InternationalPage> {
       children: [
         Consumer<HomeViewModel>(
           builder: (context, vm, _) {
-            // HILANGKAN PANGGILAN INI DARI SINI: _handleOriginDataLoad(vm);
-
-            // --- Logika Auto-Select Kota (dipindahkan ke sini) ---
+            // --- Logika Auto-Select Kota ---
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (selectedProvinceOriginId != null &&
                   vm.cityOriginList.status == Status.completed &&

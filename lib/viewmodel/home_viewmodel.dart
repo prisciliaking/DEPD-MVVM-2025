@@ -138,7 +138,8 @@ class HomeViewModel with ChangeNotifier {
   ApiResponse<List<InternationalDestination>> internationalDestinations =
       ApiResponse.notStarted();
   setInternationalDestinations(
-      ApiResponse<List<InternationalDestination>> response) {
+    ApiResponse<List<InternationalDestination>> response,
+  ) {
     internationalDestinations = response;
     notifyListeners();
   }
@@ -150,11 +151,9 @@ class HomeViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  // FIX: This method now accepts the required 'search' parameter.
+  // Ambil daftar negara tujuan internasional berdasarkan parameter search
   Future getInternationalDestinationList({required String search}) async {
-    // We do NOT check for Status.completed here because a new search query
-    // always constitutes a new request.
-    setInternationalDestinations(ApiResponse.loading()); 
+    setInternationalDestinations(ApiResponse.loading());
     _homeRepo
         // FIX: Passing the required 'search' parameter to the Repository
         .fetchInternationalDestinationList(search: search)
@@ -165,7 +164,7 @@ class HomeViewModel with ChangeNotifier {
           setInternationalDestinations(ApiResponse.error(error.toString()));
         });
   }
-  
+
   // Hitung biaya pengiriman internasional
   Future checkInternationalShipmentCost(
     String originCityId,

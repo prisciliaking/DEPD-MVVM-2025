@@ -10,28 +10,27 @@ class MainWrapper extends StatefulWidget {
 }
 
 class _MainWrapperState extends State<MainWrapper> {
-  // 1. State: Tracks the currently selected tab index.
+  // !! default page opened
   int _selectedIndex = 0;
 
-  // 2. Page List: Defines the content for each tab index.
-  // The order here MUST match the order of the BottomNavigationBarItems below.
+ // widget navigation structure in array
   static final List<Widget> _widgetOptions = <Widget>[
-    // Index 0: Domestic (home_page.dart)
+    // index 0 = home / domestic
     const HomePage(), 
-    // Index 1: International (international_page.dart)
+    // index 1: international
     const InternationalPage(),
-    // Index 2: Home (blank_page.dart)
+    // index 2: blankpage
     const BlankPage(),
   ];
 
-  // 3. Page Switcher: Updates the state when a button is tapped.
+  // !! on tap function to change page, selectedIndex = opened tab
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
   }
 
-  // 4. Dynamic Title: Updates the AppBar title based on the current page.
+  // !! app bar title
   String _getTitle() {
     switch (_selectedIndex) {
       case 0:
@@ -47,9 +46,8 @@ class _MainWrapperState extends State<MainWrapper> {
 
   @override
   Widget build(BuildContext context) {
-    // The Scaffold provides the overall screen structure (AppBar and BottomNavigationBar).
     return Scaffold(
-      // The AppBar shows the dynamically updated title
+      // app bar title changes based on selected tab
       appBar: AppBar(
         title: Text(_getTitle()),
         backgroundColor: Style.blue800,
@@ -57,34 +55,33 @@ class _MainWrapperState extends State<MainWrapper> {
         centerTitle: true,
       ),
       
-      // The body displays the content of the currently selected page
+      //!! based on selected tab
       body: _widgetOptions.elementAt(_selectedIndex),
       
-      // The Bottom Navigation Bar handles the switching between pages.
+      // !! navigation bar at the bottom
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
-          // Button 1 (Index 0): Domestic (Truck icon)
+          // domestic
           BottomNavigationBarItem(
             icon: Icon(Icons.local_shipping),
             label: 'Domestic',
           ),
-          // Button 2 (Index 1): International (Plane icon)
+          // international
           BottomNavigationBarItem(
             icon: Icon(Icons.flight_takeoff), 
             label: 'International',
           ),
-          // Button 3 (Index 2): Home (Grid/Dashboard icon)
+          // blankpage
           BottomNavigationBarItem(
             icon: Icon(Icons.apps_rounded), 
             label: 'Hello',
           ),
         ],
-        currentIndex: _selectedIndex, // Links to the state variable
-        onTap: _onItemTapped, // Links to the page switching function
+        currentIndex: _selectedIndex, 
+        onTap: _onItemTapped, 
         
-        // Styling to match the selected blue and unselected grey look
-        selectedItemColor: Style.blue800, // Blue for the active tab
-        unselectedItemColor: Colors.grey, // Grey for inactive tabs
+        selectedItemColor: Style.blue800, // opened tab
+        unselectedItemColor: Colors.grey, //un-opened tab
         selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
         type: BottomNavigationBarType.fixed, // Ensures items are always visible
       ),
